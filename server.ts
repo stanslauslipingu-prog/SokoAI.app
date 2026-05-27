@@ -52,11 +52,11 @@ try {
 }
 
 // Load Admin credentials from environment with default fallbacks for safety
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'EzekielEzekielLipinguJanethCosmasMleki@1990';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'BadilishaNywilaHapa123!';
 const ADMIN_Q1 = process.env.ADMIN_Q1 || 'Jina la shule yako ya msingi?';
-const ADMIN_A1 = process.env.ADMIN_A1 || 'Mbagula';
+const ADMIN_A1 = process.env.ADMIN_A1 || 'Shule';
 const ADMIN_Q2 = process.env.ADMIN_Q2 || 'Chakula unachopenda zaidi?';
-const ADMIN_A2 = process.env.ADMIN_A2 || 'Lingamba';
+const ADMIN_A2 = process.env.ADMIN_A2 || 'Chakula';
 
 // Seed/Update admin configuration with requested credentials
 db.prepare("INSERT OR REPLACE INTO admin_config (key, value) VALUES (?, ?)").run('password', ADMIN_PASSWORD);
