@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+
+Sitemap: https://sokoai-mchambuzi-wa-biashara-310337860951.europe-west2.run.app/sitemap.xml

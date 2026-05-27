@@ -1,0 +1,6 @@
+{
+  "name": "SokoAI - Mchambuzi wa Biashara",
+  "description": "Msaidizi wa biashara kwa wajasiriamali wadogo Tanzania. Chambua mauzo, faida, na upate ripoti za kisasa kwa sekunde.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["Business Analysis", "OCR", "Financial Reporting", "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
