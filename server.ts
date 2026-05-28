@@ -6,8 +6,9 @@ import Database from "better-sqlite3";
 import { fileURLToPath } from "url";
 import { GoogleGenAI } from "@google/genai";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const isESM = typeof import.meta !== "undefined" && !!import.meta.url;
+const _filename = isESM ? fileURLToPath(import.meta.url) : (typeof __filename !== "undefined" ? __filename : "");
+const _dirname = isESM ? path.dirname(_filename) : (typeof __dirname !== "undefined" ? __dirname : "");
 
 const db = new Database("subscription.db");
 
