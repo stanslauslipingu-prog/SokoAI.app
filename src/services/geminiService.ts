@@ -412,6 +412,9 @@ export const analyzeBusinessData = async (input: string | any[] | any, history: 
     return data.text || "Samahani, sijapata jibu.";
   } catch (error: any) {
     console.error("Analysis client error:", error);
+    if (error && error.message && !error.message.includes("fetch") && !error.message.includes("Network") && !error.message.includes("Failed")) {
+      return error.message;
+    }
     return "Mawasiliano na msaidizi wa AI yameshindikana kwa sasa. Tafadhali jaribu tena baada ya sekunde chache au angalia mtandao wako.";
   }
 };

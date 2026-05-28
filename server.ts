@@ -173,12 +173,30 @@ async function startServer() {
   app.use(express.json());
 
   let aiClient: GoogleGenAI | null = null;
+  function translateGeminiError(errMsg: string): string {
+    const msg = errMsg.toLowerCase();
+    
+    if (msg.includes("gemini_api_key environment variable is missing") || msg.includes("api key is missing") || msg.includes("api_key_missing") || msg.includes("missing")) {
+      return "GEMINI_API_KEY haijawekwa kwenye seva ya Render (Environment Variables)! Tafadhali nenda kwenye Render Dashboard ya programu yako, bofya 'Settings' kisha 'Environment Variables', halafu ongeza 'GEMINI_API_KEY' na uweke ufunguo wako wa siri wa Google Gemini API ili msaidizi wa AI aanze kukusaidia.";
+    }
+    
+    if (msg.includes("api_key_invalid") || msg.includes("api key not valid") || msg.includes("invalid api key") || msg.includes("key not valid") || msg.includes("api key not found")) {
+      return "Ufunguo wako wa siri wa Gemini API (GEMINI_API_KEY) uliowekwa kwenye Render sio sahihi au umekosewa (Invalid API Key). Tafadhali thibitisha ufunguo wako kwenye Google AI Studio kisha urekebishe kwenye Render Dashboard.";
+    }
+    
+    if (msg.includes("quota") || msg.includes("exhausted") || msg.includes("limit") || msg.includes("429")) {
+      return "Kikomo cha matumizi ya bure au kasi ya maombi ya Gemini API kimefikiwa kwa sasa kwenye ufunguo huu (Quota/Rate Limit Exhausted). Tafadhali jaribu tena baada ya sekunde 60 au badilisha API Key yako kwenye Render dashboard.";
+    }
+    
+    return `Hitilafu ya kiufundi imetokea kwenye mfumo wa Gemini AI (Google): ${errMsg}. Tafadhali thibitisha ufunguo wako wa siri wa GEMINI_API_KEY kisha uhakikishe mipangilio yako ya Render.`;
+  }
+
   function getGeminiClient() {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) {
+      throw new Error("GEMINI_API_KEY environment variable is missing in system environment context.");
+    }
     if (!aiClient) {
-      const key = process.env.GEMINI_API_KEY;
-      if (!key) {
-        throw new Error("GEMINI_API_KEY environment variable is missing in system environment context.");
-      }
       aiClient = new GoogleGenAI({
         apiKey: key,
         httpOptions: {
@@ -312,7 +330,8 @@ async function startServer() {
       res.json({ text: response.text || "Samahani, sijapata jibu." });
     } catch (error: any) {
       console.error("Gemini Proxy Error:", error);
-      res.status(500).json({ error: error.message || "Hitilafu imetokea wakati wa kuwasiliana na Gemini API" });
+      const userFriendlyMessage = translateGeminiError(error.message || "");
+      res.status(500).json({ error: userFriendlyMessage });
     }
   });
 
@@ -801,51 +820,6 @@ async function startServer() {
     });
   });
 
-  // Explicit route for search engines to fetch sitemap.xml dynamically (Supporting both with and without leading dot)
-  app.get(["/sitemap.xml", "/.sitemap.xml"], (req, res) => {
-    const protocol = req.headers["x-forwarded-proto"] || (req.secure ? "https" : "http");
-    const host = req.headers.host || "sokoai-mchambuzi-wa-biashara-310337860951.europe-west2.run.app";
-    const origin = `${protocol}://${host}`;
-    const today = new Date().toISOString().split("T")[0]; // Dynamically output today's date
-
-    res.header("Content-Type", "application/xml; charset=utf-8");
-    res.send(`<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-  <url>
-    <loc>${origin}/</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>${origin}/about</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>${origin}/privacy</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>${origin}/terms</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>${origin}/contact</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-</urlset>`);
-  });
-
   // Helper template for E-E-A-T pages
   const renderTrustPage = (title: string, contentHtml: string, currentRoute: string, year: number) => {
     return `<!DOCTYPE html>
@@ -1119,25 +1093,6 @@ async function startServer() {
       "contact",
       new Date().getFullYear()
     ));
-  });
-
-  // Explicit route for search engines to fetch robots.txt dynamically
-  app.get("/robots.txt", (req, res) => {
-    const protocol = req.headers["x-forwarded-proto"] || (req.secure ? "https" : "http");
-    const host = req.headers.host || "sokoai-mchambuzi-wa-biashara-310337860951.europe-west2.run.app";
-    const origin = `${protocol}://${host}`;
-
-    res.header("Content-Type", "text/plain; charset=utf-8");
-    res.send(`User-agent: *
-Allow: /
-Allow: /about
-Allow: /privacy
-Allow: /terms
-Allow: /contact
-Disallow: /api/
-Disallow: /admin
-
-Sitemap: ${origin}/sitemap.xml`);
   });
 
   // Vite middleware for development
