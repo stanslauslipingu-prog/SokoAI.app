@@ -1147,12 +1147,6 @@ Sitemap: https://sokoai-app-1.onrender.com/sitemap.xml`);
 </urlset>`);
   });
 
-  // Serves Google site verification html explicitly
-  app.get("/google32f2928e8f0e7138.html", (req, res) => {
-    res.type("text/html; charset=utf-8");
-    res.send("google-site-verification: google32f2928e8f0e7138.html");
-  });
-
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
