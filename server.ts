@@ -1096,6 +1096,63 @@ async function startServer() {
     ));
   });
 
+  // Serves Robots.txt explicitly with correct headers for search engines
+  app.get("/robots.txt", (req, res) => {
+    res.type("text/plain; charset=utf-8");
+    res.send(`User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+
+Sitemap: https://sokoai-app-1.onrender.com/sitemap.xml`);
+  });
+
+  // Serves Sitemap.xml explicitly with exact XML structure
+  app.get("/sitemap.xml", (req, res) => {
+    res.type("application/xml; charset=utf-8");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  <url>
+    <loc>https://sokoai-app-1.onrender.com/</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://sokoai-app-1.onrender.com/about</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://sokoai-app-1.onrender.com/privacy</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://sokoai-app-1.onrender.com/terms</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://sokoai-app-1.onrender.com/contact</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>`);
+  });
+
+  // Serves Google site verification html explicitly
+  app.get("/google32f2928e8f0e7138.html", (req, res) => {
+    res.type("text/html; charset=utf-8");
+    res.send("google-site-verification: google32f2928e8f0e7138.html");
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
