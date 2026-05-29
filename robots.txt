@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /admin
 
-Sitemap: https://sokoai-app.onrender.com/sitemap.xml
+Sitemap: https://sokoai-app-1.onrender.com/sitemap.xml
